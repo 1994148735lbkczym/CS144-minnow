@@ -4,13 +4,39 @@
 #include <iostream>
 #include <span>
 #include <string>
-
 using namespace std;
 
 void get_URL( const string& host, const string& path )
 {
-  cerr << "Function called: get_URL(" << host << ", " << path << ")\n";
-  cerr << "Warning: get_URL() has not been implemented yet.\n";
+  //cerr << "Function called: get_URL(" << host << ", " << path << ")\n";
+  //cerr << "Warning: get_URL() has not been implemented yet.\n";
+  // open a socket - using an address?
+  // host then service
+
+  /*
+  telnet cs144.keithw.org http .
+  GET /hello HTTP/1.1
+  Host: cs144.keithw.org
+  Connection: close
+  */
+
+  const string service = "http";
+  Address addr(host, service);
+
+  TCPSocket webget_socket;
+  webget_socket.connect(addr);
+  // send http requests over socket
+  const string msgs = "GET " + path + " HTTP/1.1\r\nHost: " + host + "\r\nConnection: close\r\n\r\n";
+  webget_socket.write(msgs);
+
+  string buffer = "";
+  webget_socket.read(buffer);
+  while (webget_socket.eof() != true) 
+  {
+    cout << buffer;
+    webget_socket.read(buffer);
+  }
+  // final read
 }
 
 int main( int argc, char* argv[] )
