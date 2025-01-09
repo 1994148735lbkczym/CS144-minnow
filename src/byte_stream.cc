@@ -26,22 +26,22 @@ void Writer::push( string data )
 
 void Writer::close()
 {
-  // Your code here.
+  this->open_ = false;
 }
 
 bool Writer::is_closed() const
 {
-  return {}; // Your code here.
+  return !this->open_; 
 }
 
 uint64_t Writer::available_capacity() const
 {
-  return {}; // Your code here.
+  return this->capacity_; 
 }
 
 uint64_t Writer::bytes_pushed() const
 {
-  return {}; // Your code here.
+  return this->bytes_pushed_; 
 }
 
 string_view Reader::peek() const
