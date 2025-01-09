@@ -2,7 +2,7 @@
 
 using namespace std;
 
-ByteStream::ByteStream( uint64_t capacity ) : capacity_( capacity ) {}
+ByteStream::ByteStream( uint64_t capacity ) : capacity_( capacity ), data_(), newRead_() {}
 
 // push one byte at a time
 void Writer::push( string data )
