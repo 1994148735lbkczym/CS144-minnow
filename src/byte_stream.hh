@@ -1,9 +1,9 @@
 #pragma once
 
 #include <cstdint>
+#include <queue>
 #include <string>
 #include <string_view>
-#include <queue>
 
 class Reader;
 class Writer;
@@ -28,7 +28,6 @@ protected:
   bool error_ {};
   // new datastructure
   std::queue<char> data_;
-  //std::queue<int> msg_size_;
   bool open_ = true;
   uint64_t bytes_pushed_ = 0;
   uint64_t bytes_popped_ = 0;
