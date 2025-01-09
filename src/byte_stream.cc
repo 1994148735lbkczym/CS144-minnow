@@ -16,7 +16,6 @@ void Writer::push( string data )
     this->data_.emplace( byte );
     this->capacity_--;
     this->bytes_pushed_++;
-    datasize++;
     this->newRead_ += byte;
   }
 
