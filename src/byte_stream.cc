@@ -4,9 +4,24 @@ using namespace std;
 
 ByteStream::ByteStream( uint64_t capacity ) : capacity_( capacity ) {}
 
+// push one byte at a time
 void Writer::push( string data )
 {
-  (void)data; // Your code here.
+  uint64_t datasize = 0;
+  for (const char &byte : data) {
+    // break if full
+    if (this->capacity_ == 0) {
+      break;
+    }
+    // push one byte at a time, check capacity
+    this->data_.emplace(byte);
+    this->capacity_--;
+    this->bytes_pushed_++;
+    datasize++;
+    this->newRead_ += byte;
+  }
+  
+  return;
 }
 
 void Writer::close()
