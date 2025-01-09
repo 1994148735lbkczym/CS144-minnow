@@ -1,5 +1,6 @@
 #include "byte_stream.hh"
 
+
 using namespace std;
 
 ByteStream::ByteStream( uint64_t capacity ) : capacity_( capacity ), data_(), newRead_() {}
@@ -24,6 +25,7 @@ void Writer::push( string data )
   return;
 }
 
+
 void Writer::close()
 {
   this->open_ = false;
@@ -46,7 +48,7 @@ uint64_t Writer::bytes_pushed() const
 
 string_view Reader::peek() const
 {
-  return {}; // Your code here.
+  return string_view(this->newRead_); 
 }
 
 void Reader::pop( uint64_t len )
@@ -56,16 +58,16 @@ void Reader::pop( uint64_t len )
 
 bool Reader::is_finished() const
 {
-  return {}; // Your code here.
+  return this->data_.size() == 0 && !this->open_; 
 }
 
 uint64_t Reader::bytes_buffered() const
 {
-  return {}; // Your code here.
+  return this->bytes_pushed_ - this->bytes_popped_; 
 }
 
 uint64_t Reader::bytes_popped() const
 {
-  return {}; // Your code here.
+  return this->bytes_popped_; 
 }
 
