@@ -53,7 +53,17 @@ string_view Reader::peek() const
 
 void Reader::pop( uint64_t len )
 {
-  (void)len; // Your code here.
+
+  uint64_t idx = len;
+  while (this->data_.size() != 0 && len != 0) {
+    this->data_.pop();
+    len--;
+    this->bytes_popped_++;
+    this->capacity_++;
+  }
+
+  // change this->newRead using substr, saves memory
+  this->newRead_ = this->newRead_.substr(idx);
 }
 
 bool Reader::is_finished() const
