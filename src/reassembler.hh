@@ -1,12 +1,14 @@
 #pragma once
 
 #include "byte_stream.hh"
+#include <unordered_map>
+
 
 class Reassembler
 {
 public:
   // Construct Reassembler to write into given ByteStream.
-  explicit Reassembler( ByteStream&& output ) : output_( std::move( output ) ) {}
+  explicit Reassembler( ByteStream&& output ) : output_( std::move( output ) ), recent_index(-1), saved_bytes() {}
 
   /*
    * Insert a new substring to be reassembled into a ByteStream.
@@ -43,4 +45,8 @@ public:
 
 private:
   ByteStream output_;
+
+  uint64_t recent_index;
+  std::unordered_map<uint64_t, char> saved_bytes;
+
 };
