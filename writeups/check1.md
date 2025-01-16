@@ -1,11 +1,11 @@
 Checkpoint 1 Writeup
 ====================
 
-My name: [your name here]
+My name: Raymond Llata
 
-My SUNet ID: [your sunetid here]
+My SUNet ID: rllata
 
-I collaborated with: [list sunetids here]
+I collaborated with: kyles7
 
 I would like to thank/reward these classmates for their help: [list sunetids here]
 
@@ -15,6 +15,15 @@ I was surprised by or edified to learn that: [describe]
 
 Report from the hands-on component of the lab checkpoint: [include
 information from 2.1(4), and report on your experience in 2.2]
+
+Average Time Taken: 11.2 ms
+1676 packets transmitted, 1676 received, 0% packet loss, time 339811ms
+rtt min/avg/max/mdev = 6.076/11.200/126.409/9.767 ms
+0% packet loss?
+Did not see some DUP messages
+Yes, saw Source/DST/TTL and a few others.
+The TTL is different and requests say reply and vice versa.
+
 
 Describe Reassembler structure and design. [Describe data structures and
 approach taken. Describe alternative designs considered or tested.
