@@ -46,7 +46,7 @@ public:
 private:
   ByteStream output_;
 
-  uint64_t recent_index;
-  std::unordered_map<uint64_t, char> saved_bytes;
+  int64_t recent_index;
+  std::unordered_map<uint64_t, std::pair<char, bool>> saved_bytes;
 
 };
