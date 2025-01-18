@@ -61,6 +61,12 @@ believe a PQ could have been simpler when implementing some parts of the reassem
 I could simply peek and pop on a loop to readd. One challenge it would pose is it would not do well with duplicates, so I would need to find a quick way of 
 checking if a item already exists. An unordered_map excels at this O(1) runtime.
 
+17/18 Test #39: byte_stream_speed_test ...........   Passed    0.53 sec
+      Start 40: reassembler_speed_test
+        Reassembler throughput (no overlap):   2.23 Gbit/s
+        Reassembler throughput (10x overlap):  0.35 Gbit/s
+18/18 Test #40: reassembler_speed_test ...........   Passed    0.99 sec
+
 
 Implementation Challenges:
 [Mac UTM default compiler made it so I couldnt pass reassembler_win for a while. Ed post #251 helped alot, thanks Keith!!
