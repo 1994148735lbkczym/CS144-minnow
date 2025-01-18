@@ -7,6 +7,7 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
 {
   // Initialize a index for looping through the data string
   size_t data_index = 0;
+
   // CASE: if data string overlaps with data that has already been added to the reassembler/bytestream 
   //    -> skip bytes until we reach new information
   while ((int64_t) first_index <= recent_index && data_index < data.length()) {
@@ -40,8 +41,6 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
     first_index += update_size;
     data_index += update_size;
     recent_index = first_index - 1; // first_index represents unadded
-
-    
   }
 
   // CASE: All Data skipped or added to stream + lastSubstring flag raised
