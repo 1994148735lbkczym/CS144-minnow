@@ -45,8 +45,9 @@ public:
 
 private:
   ByteStream output_;
-
+  // store the most recent index seen -> used to find the next index that should be added
   int64_t recent_index;
+  // save bytes that cannot be added yet
   std::unordered_map<uint64_t, std::pair<char, bool>> saved_bytes;
 
 };
