@@ -13,7 +13,6 @@ void get_URL( const string& host, const string& path )
   //  open a socket - using an address
   //  host then service
 
-
   const string service = "http";
   Address addr( host, service );
 
