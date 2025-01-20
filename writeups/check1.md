@@ -74,7 +74,9 @@ I struggled also in understanding when the Reassembler could close the connectio
 and the way I went about this was really just running the test cases and studying them to derive what correct behavior would be.]
 
 Remaining Bugs:
-[None (hopefully)]
+One bug this reassembler could have is with bytes that have been corrupted. The Reassembler only stores/enqueues the first byte receieved -- this means that if the first byte recieved has been corrupted, the Reassembler would not be able to fix this. One method to fix this would implement a byte-updating protocol; in storage, only the most recent copy of each byte is stored. However, most the test cases seem to imply we will recieve well formatted data.
+
+Another bug would be if the reassembler is passed a string that exceeds max storage capacity, and has a end_of_string flag attatched; since the last byte exceeds capacity it would not be stored/pushed, and the bytestream would never be closed. For well formatted data, this is not an issue, but if this is not a valid assumption, the Reassembler will leave the stream open in this case.
 
 - Optional: I had unexpected difficulty with: [describe]
 
