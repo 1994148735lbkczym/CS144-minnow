@@ -40,6 +40,73 @@ I felt like this class was fairly straightforward, and there was not much need f
 Implementation Challenges:
 [I found some of the edge cases to not be well discussed in the Lab Handout/Lecture so I had to spend alot of time reading through test cases to derive the proper functionality.]
 
+Test project /home/cs144/checkpoint0/minnow/build
+      Start  1: compile with bug-checkers
+ 1/30 Test  #1: compile with bug-checkers ........   Passed    2.06 sec
+      Start  3: byte_stream_basics
+ 2/30 Test  #3: byte_stream_basics ...............   Passed    0.01 sec
+      Start  4: byte_stream_capacity
+ 3/30 Test  #4: byte_stream_capacity .............   Passed    0.01 sec
+      Start  5: byte_stream_one_write
+ 4/30 Test  #5: byte_stream_one_write ............   Passed    0.01 sec
+      Start  6: byte_stream_two_writes
+ 5/30 Test  #6: byte_stream_two_writes ...........   Passed    0.01 sec
+      Start  7: byte_stream_many_writes
+ 6/30 Test  #7: byte_stream_many_writes ..........   Passed    0.06 sec
+      Start  8: byte_stream_stress_test
+ 7/30 Test  #8: byte_stream_stress_test ..........   Passed    0.02 sec
+      Start  9: reassembler_single
+ 8/30 Test  #9: reassembler_single ...............   Passed    0.01 sec
+      Start 10: reassembler_cap
+ 9/30 Test #10: reassembler_cap ..................   Passed    0.01 sec
+      Start 11: reassembler_seq
+10/30 Test #11: reassembler_seq ..................   Passed    0.01 sec
+      Start 12: reassembler_dup
+11/30 Test #12: reassembler_dup ..................   Passed    0.03 sec
+      Start 13: reassembler_holes
+12/30 Test #13: reassembler_holes ................   Passed    0.01 sec
+      Start 14: reassembler_overlapping
+13/30 Test #14: reassembler_overlapping ..........   Passed    0.01 sec
+      Start 15: reassembler_win
+14/30 Test #15: reassembler_win ..................   Passed    6.63 sec
+      Start 16: wrapping_integers_cmp
+15/30 Test #16: wrapping_integers_cmp ............   Passed    0.01 sec
+      Start 17: wrapping_integers_wrap
+16/30 Test #17: wrapping_integers_wrap ...........   Passed    0.00 sec
+      Start 18: wrapping_integers_unwrap
+17/30 Test #18: wrapping_integers_unwrap .........   Passed    0.01 sec
+      Start 19: wrapping_integers_roundtrip
+18/30 Test #19: wrapping_integers_roundtrip ......   Passed    0.28 sec
+      Start 20: wrapping_integers_extra
+19/30 Test #20: wrapping_integers_extra ..........   Passed    0.22 sec
+      Start 21: recv_connect
+20/30 Test #21: recv_connect .....................   Passed    0.01 sec
+      Start 22: recv_transmit
+21/30 Test #22: recv_transmit ....................   Passed    0.25 sec
+      Start 23: recv_window
+22/30 Test #23: recv_window ......................   Passed    0.01 sec
+      Start 24: recv_reorder
+23/30 Test #24: recv_reorder .....................   Passed    0.01 sec
+      Start 25: recv_reorder_more
+24/30 Test #25: recv_reorder_more ................   Passed   12.83 sec
+      Start 26: recv_close
+25/30 Test #26: recv_close .......................   Passed    0.01 sec
+      Start 27: recv_special
+26/30 Test #27: recv_special .....................   Passed    0.04 sec
+      Start 37: no_skip
+27/30 Test #37: no_skip ..........................   Passed    0.00 sec
+      Start 38: compile with optimization
+28/30 Test #38: compile with optimization ........   Passed    2.41 sec
+      Start 39: byte_stream_speed_test
+        ByteStream throughput (pop length 4096):  2.29 Gbit/s
+        ByteStream throughput (pop length 128):   0.97 Gbit/s
+        ByteStream throughput (pop length 32):    0.37 Gbit/s
+29/30 Test #39: byte_stream_speed_test ...........   Passed    0.52 sec
+      Start 40: reassembler_speed_test
+        Reassembler throughput (no overlap):   2.22 Gbit/s
+        Reassembler throughput (10x overlap):  0.28 Gbit/s
+30/30 Test #40: reassembler_speed_test ...........   Passed    1.20 sec
+
 Remaining Bugs:
 [None, I hope.]
 
