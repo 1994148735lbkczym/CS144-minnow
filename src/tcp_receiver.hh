@@ -32,5 +32,4 @@ private:
   uint64_t first_unassembled_index_ = 0;
   Wrap32 zero_point_ = Wrap32( 0 );
   bool received_rst_ = false;
-  // uint64_t window_size_ = UINT16_MAX;
 };

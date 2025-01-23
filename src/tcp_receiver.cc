@@ -9,17 +9,18 @@ void TCPReceiver::receive( TCPSenderMessage message )
   if (message.SYN && !this->received_isn_) {
     this->received_isn_ = true;
     this->zero_point_ = message.seqno;
+    // update index to count ISN index
     this->first_unassembled_index_++;
   }
 
-  // set error if RST flag?
+  // set error if RST flag and return
   if (message.RST) {
     reassembler_.reader().set_error();
     this->received_rst_ = true;
     return;
   }
 
-  // cannot write if no isn; return and (raise error?)
+  // cannot write if no isn; return
   if (!this->received_isn_) {
     return;
   }
@@ -35,7 +36,7 @@ void TCPReceiver::receive( TCPSenderMessage message )
   uint64_t reassembler_capacity_post = reassembler_.writer().available_capacity();
   this->first_unassembled_index_ += reassembler_capacity_pre - reassembler_capacity_post;
   
-  // add FIN byte if needed
+  // add FIN byte index if needed
   if (reassembler_.writer().is_closed()) {
     this->first_unassembled_index_++;
   }
