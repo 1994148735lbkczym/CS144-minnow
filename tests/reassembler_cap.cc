@@ -146,6 +146,42 @@ int main()
       test.execute( ReadAll( "c" ) );
       test.execute( IsFinished { true } );
     }
+
+    // test credit: Parth Sarthi
+    {
+      ReassemblerTestHarness test { "last substring exactly fills capacity", 2 };
+
+      test.execute( Insert { "a", 0 } );
+      test.execute( Insert { "b", 1 } );
+      test.execute( ReadAll( "ab" ) );
+
+      test.execute( Insert { "c", 2 } );
+      test.execute( ReadAll( "c" ) );
+
+      test.execute( Insert { "de", 3 }.is_last() );
+      test.execute( ReadAll( "de" ) );
+
+      test.execute( IsFinished { true } );
+    }
+
+    // test credit: Parth Sarthi
+    {
+      ReassemblerTestHarness test { "last substring called but not all bytes written", 2 };
+
+      test.execute( Insert { "a", 0 } );
+      test.execute( Insert { "b", 1 } );
+      test.execute( ReadAll( "ab" ) );
+
+      test.execute( Insert { "c", 2 } );
+      test.execute( ReadAll( "c" ) );
+
+      test.execute( Insert { "def", 3 }.is_last() );
+      test.execute( ReadAll( "de" ) );
+
+      test.execute( IsFinished { false } );
+    }
+
+
   } catch ( const exception& e ) {
     cerr << "Exception: " << e.what() << "\n";
     return EXIT_FAILURE;
