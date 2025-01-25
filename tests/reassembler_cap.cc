@@ -146,6 +146,29 @@ int main()
       test.execute( ReadAll( "c" ) );
       test.execute( IsFinished { true } );
     }
+
+    // test credit: Andy Wang
+    {
+      ReassemblerTestHarness test { "insert beyond capacity at uint64max", 3 };
+
+      test.execute( Insert { "b", 1 }.is_last() );
+      test.execute( BytesPushed( 0 ) );
+      test.execute( BytesPending( 1 ) );
+
+      test.execute( Insert { "z", UINT64_MAX } );
+      test.execute( BytesPushed( 0 ) );
+      test.execute( BytesPending( 1 ) );
+
+      test.execute( Insert { "xyz", UINT64_MAX - 1 } );
+      test.execute( BytesPushed( 0 ) );
+      test.execute( BytesPending( 1 ) );
+
+      test.execute( Insert { "a", 0 } );
+      test.execute( BytesPushed( 2 ) );
+      test.execute( BytesPending( 0 ) );
+      test.execute( ReadAll( "ab" ) );
+      test.execute( IsFinished( true ) );
+    }
   } catch ( const exception& e ) {
     cerr << "Exception: " << e.what() << "\n";
     return EXIT_FAILURE;
