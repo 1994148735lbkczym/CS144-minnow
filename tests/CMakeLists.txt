@@ -44,6 +44,7 @@ add_test_exec(reassembler_dup)
 add_test_exec(reassembler_holes)
 add_test_exec(reassembler_overlapping)
 add_test_exec(reassembler_win)
+add_test_exec(reassembler_empty_last_received_first)
 
 add_test_exec(no_skip)
 
