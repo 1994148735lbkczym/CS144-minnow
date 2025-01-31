@@ -3,6 +3,7 @@
 #include "byte_stream.hh"
 #include "tcp_receiver_message.hh"
 #include "tcp_sender_message.hh"
+#include <map>
 
 #include <functional>
 
@@ -29,14 +30,7 @@ public:
   /* Time has passed by the given # of milliseconds since the last time the tick() method was called */
   void tick( uint64_t ms_since_last_tick, const TransmitFunction& transmit );
 
-  /* Set the Retransmission timer alarm, generally references RTO value */
-  void set_rto_alarm();
 
-  /* Check the existing Retransmission timer alarm given time since last tick information, returns true if timer has expired, false otherwise */
-  bool check_rto_alarm( uint64_t ms_since_last_tick );
-
-  /* Stop the RTO alarm if all outstanding data has been acknowledged */
-  void stop_rto_alarm();
 
   // Accessors
   uint64_t sequence_numbers_in_flight() const;  // For testing: how many sequence numbers are outstanding?
@@ -48,6 +42,21 @@ public:
 private:
   Reader& reader() { return input_.reader(); }
 
+    /* Set the Retransmission timer alarm, generally references RTO value */
+  void set_rto_alarm();
+
+  /* Check the existing Retransmission timer alarm given time since last tick information, returns true if timer has expired, false otherwise */
+  bool check_rto_alarm( uint64_t ms_since_last_tick );
+
+  /* Stop the RTO alarm if all outstanding data has been acknowledged */
+  void stop_rto_alarm();
+
+  /* Push Packet of given # of Bytes*/
+  void push_packet(uint64_t size, TCPSenderMessage &cur_message, const TransmitFunction& transmit, bool false_window);
+
+  // update the expected ackno to the first, segment to which we have not recieved a reply; also cleans map
+  void update_expected_ackno_and_clean(uint64_t msg_ackno);
+
   ByteStream input_;
   Wrap32 isn_;
   uint64_t initial_RTO_ms_;
@@ -56,7 +65,13 @@ private:
   // state for tcp_sender
   uint64_t expected_ackno_ = 0;
   uint64_t last_segment_sent_ = 0;
-  unordered_map<uint64_t, TCPSenderMessage> outstanding_segments = {};
+  std::map<uint64_t, TCPSenderMessage> outstanding_segments = {};
+  uint64_t bytes_outstanding = 0;
+
+  // window size defaults to 0 to start a simple packet process to receive true window_size
+  uint64_t window_size = 1;
+  bool connection_started = false;
+  
 
 
   // state(s) for retransimission timer; only used in rto_timer_functions
