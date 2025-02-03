@@ -52,10 +52,10 @@ private:
   void stop_rto_alarm();
 
   /* Push Packet of given # of Bytes*/
-  void push_packet(uint64_t size, TCPSenderMessage &cur_message, const TransmitFunction& transmit, bool false_window);
+  void push_packet(uint64_t size, TCPSenderMessage &cur_message, const TransmitFunction& transmit, bool false_window, bool add_fin_bit);
 
   // update the expected ackno to the first, segment to which we have not recieved a reply; also cleans map
-  void update_expected_ackno_and_clean(uint64_t msg_ackno);
+  void update_last_segment_recieved_and_clean(uint64_t msg_ackno);
 
   ByteStream input_;
   Wrap32 isn_;
@@ -63,7 +63,8 @@ private:
   uint64_t curr_RTO_ms_;
 
   // state for tcp_sender
-  uint64_t expected_ackno_ = 0;
+  uint64_t last_segment_recieved_ = 0;
+  uint64_t last_ackno_received = 0;
   uint64_t last_segment_sent_ = 0;
   std::map<uint64_t, TCPSenderMessage> outstanding_segments = {};
   uint64_t bytes_outstanding = 0;
@@ -71,8 +72,9 @@ private:
   // window size defaults to 0 to start a simple packet process to receive true window_size
   uint64_t window_size = 1;
   bool connection_started = false;
+  bool sent_fin_bit = false;
+  bool RST = false;
   
-
 
   // state(s) for retransimission timer; only used in rto_timer_functions
   bool rto_timer_is_on_ = false;
