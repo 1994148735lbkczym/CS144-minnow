@@ -62,7 +62,7 @@ private:
   uint64_t initial_RTO_ms_;
   uint64_t curr_RTO_ms_;
 
-  // state for tcp_sender
+  // State for TCP_Sender
   uint64_t last_segment_recieved_ = 0;
   uint64_t last_ackno_received = 0;
   uint64_t last_segment_sent_ = 0;
