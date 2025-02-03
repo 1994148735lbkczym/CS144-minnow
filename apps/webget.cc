@@ -1,4 +1,5 @@
-#include "socket.hh"
+// #include "socket.hh"
+#include "tcp_minnow_socket.hh"
 
 #include <cstdlib>
 #include <iostream>
@@ -16,7 +17,8 @@ void get_URL( const string& host, const string& path )
   const string service = "http";
   Address addr( host, service );
 
-  TCPSocket webget_socket;
+  CS144TCPSocket webget_socket;
+  // TCPSocket webget_socket;
   webget_socket.connect( addr );
   // send http requests over socket
   const string msgs = "GET " + path + " HTTP/1.1\r\nHost: " + host + "\r\nConnection: close\r\n\r\n";
@@ -29,6 +31,7 @@ void get_URL( const string& host, const string& path )
     webget_socket.read( buffer );
   }
   // final read
+  webget_socket.wait_until_closed();
 }
 
 int main( int argc, char* argv[] )
