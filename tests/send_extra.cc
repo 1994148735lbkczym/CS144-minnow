@@ -662,6 +662,39 @@ int main()
       test.execute( ExpectNoSegment {} );
     }
 
+    // test credit: Jason Lin
+    {
+      TCPConfig cfg;
+      const Wrap32 isn( rd() );
+      cfg.isn = isn;
+
+      TCPSenderTestHarness test { "Receive multiple FINs", cfg };
+
+      // 1) First push triggers initial SYN
+      test.execute( Push {} );
+      test.execute( ExpectMessage {}.with_syn( true ).with_seqno( isn ).with_payload_size( 0 ) );
+
+      // 2) Acknowledge the SYN
+      test.execute( AckReceived { Wrap32 { isn + 1 } }.with_win( 1000 ) );
+      test.execute( ExpectNoSegment {} );
+
+      // 3) Push some data + close => we expect exactly one FIN
+      test.execute( Push { "hello" }.with_close() );
+      test.execute(
+        ExpectMessage {}.with_seqno( isn + 1 ).with_payload_size( 5 ).with_data( "hello" ).with_fin( true ) );
+
+      // 4) Another "close" or push+close should not generate a second FIN
+      test.execute( Push { "this should not ack" }.with_close() );
+      test.execute( ExpectNoSegment {} );
+
+      // 5) Partial ACK, just to show it doesn't resend the FIN
+      test.execute( AckReceived { Wrap32 { isn + 2 } } );
+      test.execute( ExpectNoSegment {} );
+
+      // 6) Confirm no error
+      test.execute( HasError { false } );
+    }
+
     // test credit: Chuyi Zhang
     {
       TCPConfig cfg;
