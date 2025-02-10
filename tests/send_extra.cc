@@ -647,6 +647,30 @@ int main()
       test.execute( HasError { false } );
     }
 
+    {
+      TCPConfig cfg;
+      const Wrap32 isn( rd() );
+      cfg.isn = isn;
+      cfg.rt_timeout = 10;
+
+      TCPSenderTestHarness test { "Any new data resets RTO timer", cfg };
+      test.execute( Push {} );
+      test.execute( ExpectMessage {}.with_no_flags().with_syn( true ).with_payload_size( 0 ).with_seqno( isn ) );
+      test.execute( AckReceived { Wrap32 { isn + 1 } }.with_win( 3 ) );
+      test.execute( Push { "abc" } );
+      test.execute( ExpectMessage {}.with_data( "abc" ) );
+      test.execute( Tick { 10 }.with_max_retx_exceeded( false ) );
+      test.execute( ExpectMessage {}.with_data( "abc" ) );
+      test.execute( AckReceived { Wrap32 { isn + 2 } } );          // Partial acknowledge resets RTO timer
+      test.execute( Tick { 10 }.with_max_retx_exceeded( false ) ); // RTO timer should be 10 again
+      test.execute( ExpectMessage {}.with_data( "abc" ) );
+
+      test.execute( Tick { 10 }.with_max_retx_exceeded( false ) ); // RTO backs off to 20
+      test.execute( ExpectNoSegment {} );
+      test.execute( Tick { 10 }.with_max_retx_exceeded( false ) );
+      test.execute( ExpectMessage {}.with_data( "abc" ) );
+    }
+
     // test credit: Sasha Moore
     {
       TCPConfig cfg;
