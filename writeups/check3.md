@@ -9,7 +9,7 @@ I collaborated with: [list sunetids here]
 
 I would like to thank/reward these classmates for their help: [list sunetids here]
 
-This checkpoint took me about [n] hours to do. I [did/did not] attend the lab session.
+This checkpoint took me about [n] hours to do. I [did not] attend the lab session.
 
 Program Structure and Design of the TCPSender [Describe data
 structures and approach taken. Describe alternative designs considered
@@ -25,7 +25,10 @@ The alternate approach I had in mind was using two data structures; a Queue and 
 
 My class functions were fairly straightfoward. For Tick() I simply coded the algorithm straight from the Assignment Spec. For Recieve() I added a helper function to update outstanding_segments_, and other global state variables. The logic gates in Recieve() were more or less taken straight from the assignment spec. Push() was my most complicated function. My approach was to create a helper, push_packet(), that when given the proper information, would be able to push every type of packet required. The logic in Push() mainly looks at the input_, and global state variables, and makes a decision as to what kind of packet to push. It will pass this information to push_packet(), which will create a Message and transmit it. I created many intermediate state variables for clarity and a better debugging experience.
 
-Report from the hands-on component: []
+Report from the hands-on component: [
+
+
+]
 
 Implementation Challenges:
 []
