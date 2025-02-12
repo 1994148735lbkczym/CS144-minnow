@@ -39,6 +39,8 @@ My ls -l output:
 -rw-rw-r-- 1 cs144 cs144 100000000 Feb 12 02:49 /tmp/big-received.txt
 Their ls -l output:
 -rw-rw-r-- 1 owlyfeather6 owlyfeather6 100000000 Feb 12 02:44 /tmp/biggest.txt
+
+One thing I found interesting was the time sending larger files took. I was under the impression that the time it took to send larger files would increase linearly. (As it seemed to me that link speeds were always constant, data rate was always constant, and queue sizes / paths did not change). However, in practice it seemed that the larger files we tried to send, the longer the time would take. For example, the one Megabyte challenge took around a second, but 10 Megabytes took us around 35 seconds (as opposed to 10 seconds like I thought), and 100 Megabytes took us over five minutes (I did not keep track of exactly how long). My hypothesis for why this is is that as for larger file sizes the queues potentially fill up faster and we end up losing more bytes, but even then, as per the data rate graphs we have seen in class I do not understand why this results in a non-linear time increase.
 ]
 
 Implementation Challenges:
