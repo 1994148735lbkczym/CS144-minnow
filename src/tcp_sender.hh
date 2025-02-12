@@ -30,8 +30,6 @@ public:
   /* Time has passed by the given # of milliseconds since the last time the tick() method was called */
   void tick( uint64_t ms_since_last_tick, const TransmitFunction& transmit );
 
-
-
   // Accessors
   uint64_t sequence_numbers_in_flight() const;  // For testing: how many sequence numbers are outstanding?
   uint64_t consecutive_retransmissions() const; // For testing: how many consecutive retransmissions have happened?
@@ -42,20 +40,25 @@ public:
 private:
   Reader& reader() { return input_.reader(); }
 
-    /* Set the Retransmission timer alarm, generally references RTO value */
+  /* Set the Retransmission timer alarm, generally references RTO value */
   void set_rto_alarm();
 
-  /* Check the existing Retransmission timer alarm given time since last tick information, returns true if timer has expired, false otherwise */
+  /* Check the existing Retransmission timer alarm given time since last tick information, returns true if timer has
+   * expired, false otherwise */
   bool check_rto_alarm( uint64_t ms_since_last_tick );
 
   /* Stop the RTO alarm if all outstanding data has been acknowledged */
   void stop_rto_alarm();
 
   /* Push Packet of given # of Bytes*/
-  void push_packet(uint64_t size, TCPSenderMessage &cur_message, const TransmitFunction& transmit, bool false_window, bool add_fin_bit);
+  void push_packet( uint64_t size,
+                    TCPSenderMessage& cur_message,
+                    const TransmitFunction& transmit,
+                    bool false_window,
+                    bool add_fin_bit );
 
   // update the expected ackno to the first, segment to which we have not recieved a reply; also cleans map
-  void update_last_segment_recieved_and_clean(uint64_t msg_ackno);
+  void update_last_segment_recieved_and_clean( uint64_t msg_ackno );
 
   ByteStream input_;
   Wrap32 isn_;
@@ -74,7 +77,6 @@ private:
   bool connection_started = false;
   bool sent_fin_bit = false;
   bool RST = false;
-  
 
   // state(s) for retransimission timer; only used in rto_timer_functions
   bool rto_timer_is_on_ = false;

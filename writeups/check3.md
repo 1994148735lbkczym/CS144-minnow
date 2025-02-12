@@ -42,7 +42,11 @@ Their ls -l output:
 ]
 
 Implementation Challenges:
-[I struggled with understanding the behavior of the TCP Sender. I think that alot of the functionality was supposed to be intuitively understood without being listed on the Assignment Spec, so it was difficult for me to deduce how to implement it. I also struggled with the hands-on component, as I forgot to run commands to link my computer to the webserver / make ipv4 properly.]
+[I struggled with understanding the behavior of the TCP Sender. I think that alot of the functionality was supposed to be intuitively understood without being listed on the Assignment Spec, so it was difficult for me to deduce how to implement it. 
+
+For example, behavior with a RST Flag was not really discussed in the handout. Intuitively, I gleaned that it would be a good idea to communicate a RST Flag from Sender/Reciever ASAP, but it was unclear if it was supposed to be in a packet by itself. Another example was the SYN Flag. In class, we covered that a SYN Flag can be sent by itself or with a larger packet, but on the Assignment Handout it only explicitly mentions how to handle a SYN Flag-only packet, with no payload. This led me to believe the TCP Sender I was implementing was always initializing it's link with a reciever first. And so I proceeded like this through the first few test cases, debugging as I needed, until I found a test case were the Reciever was reaching out first, which my code did not handle. I think, for me, these were the greatest challenges. The Retransmit Timer logic was simple enough, and most of the remaining difficulty for the assignment was figuring out how to implement the functionality I want with as little state-keeping as possible.
+
+I also struggled with the hands-on component, as I forgot to run commands to link my computer to the webserver / make ipv4 properly.]
 
 Remaining Bugs:
 [N/A]
