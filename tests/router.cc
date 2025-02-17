@@ -290,7 +290,7 @@ void network_simulator()
     network.simulate();
   }
 
-  cout << green << "\n\nSuccess! Testing applesauce sending to the Internet." << normal << "\n\n";
+  cout << green << "\n\nTesting applesauce sending to the Internet..." << normal << "\n\n";
   {
     auto dgram_sent = network.host( "applesauce" ).send_to( Address { "1.2.3.4" } );
     dgram_sent.header.ttl--;
@@ -299,7 +299,7 @@ void network_simulator()
     network.simulate();
   }
 
-  cout << green << "\n\nSuccess! Testing sending to the HS network and Internet." << normal << "\n\n";
+  cout << green << "\n\nTesting sending to the HS network and Internet..." << normal << "\n\n";
   {
     auto dgram_sent = network.host( "applesauce" ).send_to( Address { "143.195.131.17" } );
     dgram_sent.header.ttl--;
@@ -326,7 +326,7 @@ void network_simulator()
     network.simulate();
   }
 
-  cout << green << "\n\nSuccess! Testing two hosts on the same network (dm42 to dm43)..." << normal << "\n\n";
+  cout << green << "\n\nTesting two hosts on the same network (dm42 to dm43)..." << normal << "\n\n";
   {
     auto dgram_sent = network.host( "dm42" ).send_to( network.host( "dm43" ).address() );
     dgram_sent.header.ttl--;
@@ -335,7 +335,7 @@ void network_simulator()
     network.simulate();
   }
 
-  cout << green << "\n\nSuccess! Testing TTL expiration..." << normal << "\n\n";
+  cout << green << "\n\nTesting TTL expiration..." << normal << "\n\n";
   {
     auto dgram_sent = network.host( "applesauce" ).send_to( Address { "1.2.3.4" }, 1 );
     network.simulate();
