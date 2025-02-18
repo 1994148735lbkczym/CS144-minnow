@@ -166,10 +166,12 @@ private:
 
   size_t default_id, eth0_id, eth1_id, eth2_id, uun3_id, hs4_id, mit5_id;
 
+  bool with_default_router_;
+
   unordered_map<string, Host> _hosts {};
 
 public:
-  Network()
+  Network( bool with_default_router = true )
     : default_id( _router.add_interface( make_shared<NetworkInterface>( "default",
                                                                         upstream,
                                                                         random_router_ethernet_address(),
@@ -196,6 +198,7 @@ public:
                                                                      empty,
                                                                      random_router_ethernet_address(),
                                                                      Address { "128.30.76.255" } ) ) )
+    , with_default_router_( with_default_router )
   {
     _hosts.insert(
       { "applesauce", Host { "applesauce", Address { "10.0.0.2" }, Address { "10.0.0.1" }, eth0_applesauce } } );
@@ -226,12 +229,15 @@ public:
     _router.add_route( ip( "10.0.0.0" ), 8, {}, eth0_id );
     _router.add_route( ip( "172.16.0.0" ), 16, {}, eth1_id );
     _router.add_route( ip( "192.168.0.0" ), 24, {}, eth2_id );
-    _router.add_route( ip( "0.0.0.0" ), 0, host( "default_router" ).address(), default_id );
     _router.add_route( ip( "198.178.229.0" ), 24, {}, uun3_id );
     _router.add_route( ip( "143.195.0.0" ), 17, host( "hs_router" ).address(), hs4_id );
     _router.add_route( ip( "143.195.128.0" ), 18, host( "hs_router" ).address(), hs4_id );
     _router.add_route( ip( "143.195.192.0" ), 19, host( "hs_router" ).address(), hs4_id );
     _router.add_route( ip( "128.30.76.255" ), 16, Address { "128.30.0.1" }, mit5_id );
+
+    if ( with_default_router_ ) {
+      _router.add_route( ip( "0.0.0.0" ), 0, host( "default_router" ).address(), default_id );
+    }
   }
 
   void simulate()
@@ -342,6 +348,20 @@ void network_simulator()
 
     dgram_sent = network.host( "applesauce" ).send_to( Address { "1.2.3.4" }, 0 );
     network.simulate();
+  }
+
+  // test credit: Thanawan Atchariyachanvanit
+  cerr << green << "\n\nConstructing network without default router." << normal << "\n";
+
+  Network network_wo_default_router( false );
+
+  cout << green
+       << "\n\nTesting sending to the Internet without a default router (The datagram should be dropped "
+          "gracefully.)..."
+       << normal << "\n\n";
+  {
+    auto dgram_sent = network_wo_default_router.host( "applesauce" ).send_to( Address { "1.2.3.4" } );
+    network_wo_default_router.simulate();
   }
 
   cout << "\n\n\033[32;1mCongratulations! All datagrams were routed successfully.\033[m\n";
