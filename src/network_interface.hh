@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <queue>
+#include <unordered_map>
 
 // A "network interface" that connects IP (the internet layer, or network layer)
 // with Ethernet (the network access layer, or link layer).
@@ -82,4 +83,29 @@ private:
 
   // Datagrams that have been received
   std::queue<InternetDatagram> datagrams_received_ {};
+
+  // Struct to bundle information for a given DST IP to prevent using parallel Datastructures
+  struct IP_info {
+    EthernetAddress eth;
+    bool isARP;
+    size_t last_dg_sent;
+    std::queue<EthernetFrame> ARP_msgs{};
+
+    // Constructor
+    IP_info() 
+        : eth()
+        , isARP(false)
+        , last_dg_sent(0)
+        , ARP_msgs() 
+    {}
+  };
+
+  // Stores IP->Ethernet Recent Info
+  std::unordered_map<uint32_t, IP_info> ip_cache_ {};
+
+  // Stores Addresses in order of most recently added
+  std::queue<std::pair<size_t, uint32_t>> ip_time_queue_ {};
+
+  // Clock func
+  size_t clock_;
 };
