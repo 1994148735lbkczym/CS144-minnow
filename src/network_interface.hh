@@ -88,14 +88,14 @@ private:
   struct IP_info {
     EthernetAddress eth;
     bool isARP;
-    size_t last_dg_sent;
-    std::queue<EthernetFrame> ARP_msgs{};
+    size_t last_arp_sent; // Used to determine if a ARP should be resent
+    std::queue<std::pair<size_t, EthernetFrame>> ARP_msgs{};
 
     // Constructor
     IP_info() 
         : eth()
         , isARP(false)
-        , last_dg_sent(0)
+        , last_arp_sent(0)
         , ARP_msgs() 
     {}
   };
