@@ -85,19 +85,15 @@ private:
   std::queue<InternetDatagram> datagrams_received_ {};
 
   // Struct to bundle information for a given DST IP to prevent using parallel Datastructures
-  struct IP_info {
+  struct IP_info
+  {
     EthernetAddress eth;
     bool isARP;
     size_t last_arp_sent; // Used to determine if a ARP should be resent
-    std::queue<std::pair<size_t, EthernetFrame>> ARP_msgs{};
+    std::queue<std::pair<size_t, EthernetFrame>> ARP_msgs {};
 
     // Constructor
-    IP_info() 
-        : eth()
-        , isARP(false)
-        , last_arp_sent(0)
-        , ARP_msgs() 
-    {}
+    IP_info() : eth(), isARP( false ), last_arp_sent( 0 ), ARP_msgs() {}
   };
 
   // Stores IP->Ethernet Recent Info

@@ -618,9 +618,11 @@ int main()
     }
 
     // CUSTOM TEST
-    // If the Network Interface is waiting on an ARP Reply from a given IP, but then they recieve a ARP Request from said IP, they should still
-    // send the queued messages, since they now know the IP/Eth Addresses. Right now, this case is not tested. Inuitively, I believe this case should either
-    // an ARP reply and end or (more likely) send an ARP reply and the queued messages after. In my code (Line ~147) I have incorrect / correct code for this test case.
+    // If the Network Interface is waiting on an ARP Reply from a given IP, but then they recieve a ARP Request from
+    // said IP, they should still send the queued messages, since they now know the IP/Eth Addresses. Right now,
+    // this case is not tested. Inuitively, I believe this case should either an ARP reply and end or (more likely)
+    // send an ARP reply and the queued messages after. In my code (Line ~147) I have incorrect / correct code for
+    // this test case.
     {
       const EthernetAddress local_eth = random_private_ethernet_address();
       NetworkInterfaceTestHarness test {
@@ -652,12 +654,11 @@ int main()
         serialize( make_arp( ARPMessage::OPCODE_REQUEST, target_eth, "192.168.0.1", {}, "4.3.2.1" ) ) ) } );
 
       // Should receive arp reply
-      test.execute( ExpectFrame {
-        make_frame( local_eth,
-                    target_eth,
-                    EthernetHeader::TYPE_ARP,
-                    serialize( make_arp(
-                        ARPMessage::OPCODE_REPLY, local_eth, "4.3.2.1", target_eth, "192.168.0.1" ) ) ) } );
+      test.execute( ExpectFrame { make_frame(
+        local_eth,
+        target_eth,
+        EthernetHeader::TYPE_ARP,
+        serialize( make_arp( ARPMessage::OPCODE_REPLY, local_eth, "4.3.2.1", target_eth, "192.168.0.1" ) ) ) } );
 
       // Should receive the two queued datagrams
       test.execute(
