@@ -616,6 +616,57 @@ int main()
         dst_suffix_3 = dst_suffix_3 + 2;
       }
     }
+
+    // CUSTOM TEST
+    // If the Network Interface is waiting on an ARP Reply from a given IP, but then they recieve a ARP Request from
+    // said IP, they should still send the queued messages, since they now know the IP/Eth Addresses. Right now,
+    // this case is not tested. Inuitively, I believe this case should either an ARP reply and end or (more likely)
+    // send an ARP reply and the queued messages after. In my code (Line ~147) I have incorrect / correct code for
+    // this test case.
+    {
+      const EthernetAddress local_eth = random_private_ethernet_address();
+      NetworkInterfaceTestHarness test {
+        "Two datagrams sent before ARP request of same addr", local_eth, Address( "4.3.2.1", 0 ) };
+
+      // Send first datagram
+      const auto datagram = make_datagram( "5.6.7.8", "13.12.11.10" );
+      test.execute( SendDatagram { datagram, Address( "192.168.0.1", 0 ) } );
+
+      // outgoing datagram should result in an ARP request
+      test.execute( ExpectFrame { make_frame(
+        local_eth,
+        ETHERNET_BROADCAST,
+        EthernetHeader::TYPE_ARP,
+        serialize( make_arp( ARPMessage::OPCODE_REQUEST, local_eth, "4.3.2.1", {}, "192.168.0.1" ) ) ) } );
+      test.execute( ExpectNoFrame {} );
+      const EthernetAddress target_eth = random_private_ethernet_address();
+
+      // Resend a second time a datagram
+      // This should not result in an ARP request
+      test.execute( SendDatagram { datagram, Address( "192.168.0.1", 0 ) } );
+      test.execute( ExpectNoFrame {} );
+
+      // ARP request should result in the queued datagram getting sent
+      test.execute( ReceiveFrame { make_frame(
+        target_eth,
+        local_eth,
+        EthernetHeader::TYPE_ARP, // NOLINTNEXTLINE(*-suspicious-*)
+        serialize( make_arp( ARPMessage::OPCODE_REQUEST, target_eth, "192.168.0.1", {}, "4.3.2.1" ) ) ) } );
+
+      // Should receive arp reply
+      test.execute( ExpectFrame { make_frame(
+        local_eth,
+        target_eth,
+        EthernetHeader::TYPE_ARP,
+        serialize( make_arp( ARPMessage::OPCODE_REPLY, local_eth, "4.3.2.1", target_eth, "192.168.0.1" ) ) ) } );
+
+      // Should receive the two queued datagrams
+      test.execute(
+        ExpectFrame { make_frame( local_eth, target_eth, EthernetHeader::TYPE_IPv4, serialize( datagram ) ) } );
+      test.execute(
+        ExpectFrame { make_frame( local_eth, target_eth, EthernetHeader::TYPE_IPv4, serialize( datagram ) ) } );
+      test.execute( ExpectNoFrame {} );
+    }
   } catch ( const exception& e ) {
     cerr << e.what() << "\n";
     return EXIT_FAILURE;
