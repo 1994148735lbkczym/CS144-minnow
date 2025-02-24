@@ -655,6 +655,44 @@ int main()
 
       test.execute( ExpectNoFrame {} );
     }
+
+    {
+      const EthernetAddress local_eth = random_private_ethernet_address();
+      NetworkInterfaceTestHarness test { "Learn from broadcast ARP reply", local_eth, Address( "5.5.5.5", 0 ) };
+
+      // Send a datagram to an unmapped address.
+      const auto queued_dgram = make_datagram( "5.5.5.5", "111.222.33.44" );
+      test.execute( SendDatagram { queued_dgram, Address( "10.0.1.2", 0 ) } );
+      // Expect an ARP request.
+      test.execute( ExpectFrame {
+        make_frame( local_eth,
+                    ETHERNET_BROADCAST,
+                    EthernetHeader::TYPE_ARP,
+                    serialize( make_arp( ARPMessage::OPCODE_REQUEST, local_eth, "5.5.5.5", {}, "10.0.1.2" ) ) ) } );
+      test.execute( ExpectNoFrame {} );
+
+      // Receive an ARP reply for an IP that isn't ours that contains a mapping we want to learn.
+      const EthernetAddress remote_eth = random_private_ethernet_address();
+      ARPMessage reply_for_someone_else
+        = make_arp( ARPMessage::OPCODE_REPLY, remote_eth, "10.0.1.2", local_eth, "10.0.1.3" );
+      test.execute( ReceiveFrame { make_frame(
+        remote_eth, ETHERNET_BROADCAST, EthernetHeader::TYPE_ARP, serialize( reply_for_someone_else ) ) } );
+
+      // We expect the queued datagram to be sent.
+      test.execute(
+        ExpectFrame { make_frame( local_eth, remote_eth, EthernetHeader::TYPE_IPv4, serialize( queued_dgram ) ) } );
+      test.execute( ExpectNoFrame {} );
+
+      // Send a datagram to the IP of the ARP reply.
+      const auto dgram = make_datagram( "5.5.5.5", "99.99.99.99" );
+      test.execute( SendDatagram { dgram, Address( "10.0.1.2", 0 ) } );
+
+      // Expect that we still have learned the mapping.
+      test.execute(
+        ExpectFrame { make_frame( local_eth, remote_eth, EthernetHeader::TYPE_IPv4, serialize( dgram ) ) } );
+
+      test.execute( ExpectNoFrame {} );
+    }
   } catch ( const exception& e ) {
     cerr << e.what() << "\n";
     return EXIT_FAILURE;
