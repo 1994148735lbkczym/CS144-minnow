@@ -617,6 +617,7 @@ int main()
       }
     }
 
+    // Test credit: Adam Lambert
     {
       const EthernetAddress local_eth = random_private_ethernet_address();
       NetworkInterfaceTestHarness test {
@@ -656,6 +657,7 @@ int main()
       test.execute( ExpectNoFrame {} );
     }
 
+    // Test credit: Adam Lambert
     {
       const EthernetAddress local_eth = random_private_ethernet_address();
       NetworkInterfaceTestHarness test { "Learn from broadcast ARP reply", local_eth, Address( "5.5.5.5", 0 ) };
