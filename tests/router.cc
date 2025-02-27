@@ -169,7 +169,7 @@ private:
   unordered_map<string, Host> _hosts {};
 
 public:
-  Network()
+  Network( bool no_default_route_test = false )
     : default_id( _router.add_interface( make_shared<NetworkInterface>( "default",
                                                                         upstream,
                                                                         random_router_ethernet_address(),
@@ -207,8 +207,17 @@ public:
     _hosts.insert( { "dm42", Host { "dm42", Address { "198.178.229.42" }, Address { "198.178.229.1" }, uun } } );
     _hosts.insert( { "dm43", Host { "dm43", Address { "198.178.229.43" }, Address { "198.178.229.1" }, uun } } );
 
+    if ( no_default_route_test ) {
+      _hosts.insert(
+        { "fake_host", Host { "fake_host", Address { "1.2.3.4" }, Address { "171.67.76.46" }, upstream } } );
+    }
+
     upstream->connect( _router.interface( default_id ) );
     upstream->connect( host( "default_router" ).interface() );
+
+    if ( no_default_route_test ) {
+      upstream->connect( host( "fake_host" ).interface() );
+    }
 
     eth0_applesauce->connect( _router.interface( eth0_id ) );
     eth0_applesauce->connect( host( "applesauce" ).interface() );
@@ -226,12 +235,15 @@ public:
     _router.add_route( ip( "10.0.0.0" ), 8, {}, eth0_id );
     _router.add_route( ip( "172.16.0.0" ), 16, {}, eth1_id );
     _router.add_route( ip( "192.168.0.0" ), 24, {}, eth2_id );
-    _router.add_route( ip( "0.0.0.0" ), 0, host( "default_router" ).address(), default_id );
     _router.add_route( ip( "198.178.229.0" ), 24, {}, uun3_id );
     _router.add_route( ip( "143.195.0.0" ), 17, host( "hs_router" ).address(), hs4_id );
     _router.add_route( ip( "143.195.128.0" ), 18, host( "hs_router" ).address(), hs4_id );
     _router.add_route( ip( "143.195.192.0" ), 19, host( "hs_router" ).address(), hs4_id );
     _router.add_route( ip( "128.30.76.255" ), 16, Address { "128.30.0.1" }, mit5_id );
+
+    if ( !no_default_route_test ) {
+      _router.add_route( ip( "0.0.0.0" ), 0, host( "default_router" ).address(), default_id );
+    }
   }
 
   void simulate()
@@ -347,10 +359,31 @@ void network_simulator()
   cout << "\n\n\033[32;1mCongratulations! All datagrams were routed successfully.\033[m\n";
 }
 
+void no_default_route_test()
+{
+  const string green = "\033[32;1m";
+  const string normal = "\033[m";
+
+  cerr << green << "Constructing network." << normal << "\n";
+
+  Network network( true /* no_default_route_test */ );
+
+  cout << green << "\n\nTesting traffic with no default route (applesauce to unknown IP)..." << normal << "\n\n";
+  {
+    auto dgram_sent = network.host( "applesauce" ).send_to( Address { "1.2.3.4" } );
+    dgram_sent.header.ttl--;
+    dgram_sent.header.compute_checksum();
+    network.simulate();
+  }
+
+  cout << "\n\n\033[32;1mCongratulations! All datagrams were routed successfully.\033[m\n";
+}
+
 int main()
 {
   try {
     network_simulator();
+    no_default_route_test();
   } catch ( const exception& e ) {
     cerr << "\n\n\n";
     cerr << "\033[31;1mError: " << e.what() << "\033[m\n";
