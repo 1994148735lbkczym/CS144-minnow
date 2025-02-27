@@ -616,6 +616,44 @@ int main()
         dst_suffix_3 = dst_suffix_3 + 2;
       }
     }
+    {
+      const EthernetAddress eth_a = random_private_ethernet_address();
+      NetworkInterfaceTestHarness test {
+        "mappings should be remembered at both request and reply time", eth_a, Address( "4.3.2.1", 0 ) };
+
+      // create network interface B: Eth = B, IP = 192.168.0.1
+      const EthernetAddress eth_b = random_private_ethernet_address();
+      const Address ip_b = Address( "192.168.0.1", 0 );
+
+      // at t = 0s, A sends ARP request to B's IP
+      test.execute( SendDatagram { make_datagram( "4.3.2.1", "192.168.0.1" ), ip_b } );
+      test.execute( ExpectFrame {
+        make_frame( eth_a,
+                    ETHERNET_BROADCAST,
+                    EthernetHeader::TYPE_ARP,
+                    serialize( make_arp( ARPMessage::OPCODE_REQUEST, eth_a, "4.3.2.1", {}, "192.168.0.1" ) ) ) } );
+      test.execute( ExpectNoFrame {} );
+
+      // at t = 10s, A receives ARP reply from B
+      // B remembers A's mapping with initialization time t = 0s (b/c learned from the ARP request)
+      // A remember's B's mapping with initialization time t = 10s (b/c learned from the ARP reply)
+      test.execute( Tick { 10000 } );
+      test.execute( ReceiveFrame {
+        make_frame( eth_b,
+                    eth_a,
+                    EthernetHeader::TYPE_ARP,
+                    serialize( make_arp( ARPMessage::OPCODE_REPLY, eth_b, "192.168.0.1", eth_a, "4.3.2.1" ) ) ) } );
+      test.execute( ExpectNoFrame {} );
+
+      // at t = 35s, A sends an IPv4 datagram to B
+      test.execute( Tick { 25000 } );
+      const auto datagram = make_datagram( "4.3.2.1", "192.168.0.1" );
+      test.execute( SendDatagram { datagram, ip_b } );
+      // if A remembered B's mapping at the time of reply, this will be pass
+      // if A used default value of t = 0 (for example) and didn't update, this would be fail
+      test.execute( ExpectFrame { make_frame( eth_a, eth_b, EthernetHeader::TYPE_IPv4, serialize( datagram ) ) } );
+      test.execute( ExpectNoFrame {} );
+    }
   } catch ( const exception& e ) {
     cerr << e.what() << "\n";
     return EXIT_FAILURE;
