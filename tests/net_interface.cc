@@ -153,6 +153,39 @@ int main()
     }
 
     {
+      // Aditi Bhaskar (aditijb@cs.stanford.edu)
+      // Purpose: This case tests what happens when you get an ack that you never requested. 
+      // Description: In network_interface, in recv_frame(), the code should create an entry in the ip
+      //    ethernet map and not assume the entry exists. This bug was found in my own code upon running 
+      //    router tests.
+      
+      const EthernetAddress local_eth = random_private_ethernet_address();
+      const EthernetAddress remote_eth = random_private_ethernet_address();
+      NetworkInterfaceTestHarness test { "learn from unrequested ARP reply", local_eth, Address( "5.5.5.5", 0 ) };
+      
+      // First, 10.0.1.1 replies to our local 5.5.5.5 with its ethernet address
+      test.execute( ReceiveFrame { make_frame(
+        remote_eth,
+        local_eth,
+        EthernetHeader::TYPE_ARP,
+        serialize( make_arp( ARPMessage::OPCODE_REPLY, remote_eth, "10.0.1.1", local_eth, "5.5.5.5" ) ) ) } );
+
+      // we don't send anything.
+      test.execute( ExpectNoFrame {} );
+
+      // Expected behavior: we should have remembered 10.0.1.1's eth address 
+      //    similarly to how we remember stuff upon an ARP broadcast
+      const auto datagram = make_datagram( "5.6.7.8", "13.12.11.10" );
+      test.execute( SendDatagram { datagram, Address( "10.0.1.1", 0 ) } );
+
+      // The entry for the dest ip should already be in our mappings, so we 
+      //    shouldn't expect a request before the datagram itself gets sent
+      test.execute(
+        ExpectFrame { make_frame( local_eth, remote_eth, EthernetHeader::TYPE_IPv4, serialize( datagram ) ) } );
+      test.execute( ExpectNoFrame {} );
+    }
+
+    {
       const EthernetAddress local_eth = random_private_ethernet_address();
       NetworkInterfaceTestHarness test { "pending mappings last five seconds", local_eth, Address( "1.2.3.4", 0 ) };
 
