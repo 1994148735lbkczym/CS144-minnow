@@ -616,6 +616,50 @@ int main()
         dst_suffix_3 = dst_suffix_3 + 2;
       }
     }
+
+    // test credit: Lara Franciulli
+    {
+      const EthernetAddress local_eth = random_private_ethernet_address();
+      const EthernetAddress target_eth = random_private_ethernet_address();
+
+      NetworkInterfaceTestHarness test { "after learning the EthernetAddress of a given hop, the NetworkInterface "
+                                         "sends any pending datagram associated with this address exactly once",
+                                         local_eth,
+                                         Address( "4.3.2.1", 0 ) };
+
+      const auto datagram = make_datagram( "5.6.7.8", "13.12.11.10" );
+
+      // Send a datagram before knowing the EthernetAddress of the next_hop, triggering an ARP request
+      test.execute( SendDatagram { datagram, Address( "192.168.0.1", 0 ) } );
+
+      // Expect ARP request to be sent
+      test.execute( ExpectFrame { make_frame(
+        local_eth,
+        ETHERNET_BROADCAST,
+        EthernetHeader::TYPE_ARP,
+        serialize( make_arp( ARPMessage::OPCODE_REQUEST, local_eth, "4.3.2.1", {}, "192.168.0.1" ) ) ) } );
+
+      // Receive an ARP reply with respective EthernetAddress
+      test.execute( ReceiveFrame { make_frame(
+        target_eth,
+        local_eth,
+        EthernetHeader::TYPE_ARP,
+        serialize( make_arp( ARPMessage::OPCODE_REPLY, target_eth, "192.168.0.1", local_eth, "4.3.2.1" ) ) ) } );
+
+      // The pending datagram should now be sent
+      test.execute(
+        ExpectFrame { make_frame( local_eth, target_eth, EthernetHeader::TYPE_IPv4, serialize( datagram ) ) } );
+
+      // Send another ARP reply for the same EthernetAddress
+      test.execute( ReceiveFrame { make_frame(
+        target_eth,
+        local_eth,
+        EthernetHeader::TYPE_ARP,
+        serialize( make_arp( ARPMessage::OPCODE_REPLY, target_eth, "192.168.0.1", local_eth, "4.3.2.1" ) ) ) } );
+
+      // No pending datagrams exist for this EthernetAddress, so no outbound frames
+      test.execute( ExpectNoFrame {} );
+    }
   } catch ( const exception& e ) {
     cerr << e.what() << "\n";
     return EXIT_FAILURE;
