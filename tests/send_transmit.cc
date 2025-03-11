@@ -13,6 +13,22 @@ int main()
 {
   try {
     auto rd = get_random_engine();
+    
+    {
+      TCPConfig cfg;
+      const Wrap32 isn( rd() );
+      cfg.isn = isn;
+      TCPReceiverMessage initiation;
+      initiation.window_size = 20;
+      initiation.RST = false;
+
+      TCPSenderTestHarness test { "Listen and connect", cfg };
+      test.execute( Receive(initiation) );
+      test.execute( Push {} );
+      test.execute( ExpectMessage {}.with_no_flags().with_syn( true ).with_payload_size( 0 ).with_seqno( isn ) );
+      test.execute( ExpectSeqno { isn + 1 } );
+      test.execute( ExpectSeqnosInFlight { 1 } );
+    }
 
     {
       TCPConfig cfg;
