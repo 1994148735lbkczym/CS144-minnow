@@ -821,6 +821,48 @@ int main()
       test.execute( ExpectNoFrame {} );
     }
 
+    // test credit: psarthi
+    {
+      const EthernetAddress eth_a = random_private_ethernet_address();
+      NetworkInterfaceTestHarness test {
+        "IP->Ethernet associations learned from broadcast ARP reply and replies both last for 30 seconds",
+        eth_a,
+        Address( "80.97.114.116", 0 ) };
+
+      // create network interface B: Eth = B, IP = 75.101.105.116 // I wonder what the IP addresses decode to?
+      const EthernetAddress eth_b = random_private_ethernet_address();
+      const Address ip_b = Address( "75.101.105.116", 0 );
+
+      // at t = 0s, A sends ARP request to B's IP
+      test.execute( SendDatagram { make_datagram( "80.97.114.116", "75.101.105.116" ), ip_b } );
+      test.execute( ExpectFrame { make_frame(
+        eth_a,
+        ETHERNET_BROADCAST,
+        EthernetHeader::TYPE_ARP,
+        serialize( make_arp( ARPMessage::OPCODE_REQUEST, eth_a, "80.97.114.116", {}, "75.101.105.116" ) ) ) } );
+      test.execute( ExpectNoFrame {} );
+
+      // at t = 10s, A receives ARP broadcast request intended for some from B
+      // A remember's B's mapping with initialization time t = 10s (b/c learned from the ARP reply)
+      test.execute( Tick { 10000 } );
+      test.execute( ReceiveFrame { make_frame(
+        eth_b,
+        ETHERNET_BROADCAST,
+        EthernetHeader::TYPE_ARP,
+        serialize( make_arp( ARPMessage::OPCODE_REQUEST, eth_b, "75.101.105.116", {}, "87.105.110.115" ) ) ) } );
+
+      test.execute( ExpectNoFrame {} );
+
+      // at t = 35s, A sends an IPv4 datagram to B
+      test.execute( Tick { 25000 } );
+      const auto datagram = make_datagram( "80.97.114.116", "75.101.105.116" );
+      test.execute( SendDatagram { datagram, ip_b } );
+      // if A remembered B's mapping at the time of reply, this will be pass
+      // if A used default value of t = 0 (for example) and didn't update, this would be fail
+      test.execute( ExpectFrame { make_frame( eth_a, eth_b, EthernetHeader::TYPE_IPv4, serialize( datagram ) ) } );
+      test.execute( ExpectNoFrame {} );
+    }
+
     {
       // Aditi Bhaskar (aditijb@cs.stanford.edu)
       // Purpose: This case tests what happens when you get an ARP reply that you never requested.
