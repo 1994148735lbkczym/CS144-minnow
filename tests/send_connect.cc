@@ -42,6 +42,22 @@ int main()
       test.execute( ExpectSeqnosInFlight { 0 } );
     }
 
+    // aalsafa: New test case to fix my TCP implementation
+    {
+      TCPConfig cfg;
+      const Wrap32 isn( rd() );
+      cfg.isn = isn;
+
+      TCPSenderTestHarness test { "SYN with nonzero initial window", cfg };
+      test.execute( Receive { { {}, 1024 } }.without_push() );
+      test.execute( Push {} );
+      test.execute( ExpectMessage {}.with_syn( true ).with_payload_size( 0 ).with_seqno( isn ).with_fin( false ) );
+      test.execute( ExpectSeqno { isn + 1 } );
+      test.execute( ExpectSeqnosInFlight { 1 } );
+      test.execute( ExpectNoSegment {} );
+      test.execute( HasError { false } );
+    }
+
     {
       TCPConfig cfg;
       const Wrap32 isn( rd() );
