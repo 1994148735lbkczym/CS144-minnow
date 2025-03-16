@@ -25,6 +25,7 @@ ttest(byte_stream_many_writes)
 ttest(byte_stream_stress_test)
 
 ttest(reassembler_single)
+ttest(reassembler_non_overlap)
 ttest(reassembler_cap)
 ttest(reassembler_seq)
 ttest(reassembler_dup)
