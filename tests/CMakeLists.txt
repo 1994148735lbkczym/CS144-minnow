@@ -38,6 +38,7 @@ add_test_exec(byte_stream_many_writes)
 add_test_exec(byte_stream_stress_test)
 
 add_test_exec(reassembler_single)
+add_test_exec(reassembler_non_overlap)
 add_test_exec(reassembler_cap)
 add_test_exec(reassembler_seq)
 add_test_exec(reassembler_dup)
